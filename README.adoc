@@ -1,0 +1,40 @@
+= Apicurio playground
+
+== Install using podman
+
+.Create network
+[source,bash]
+----
+podman network create apicurio-net
+----
+
+.Start Postgres
+[source,bash]
+----
+podman run -it \
+    --rm=true \
+    --name postgres-apicurio-registry \
+    --network=apicurio-net \
+    -e POSTGRES_USER=apicurio-registry-user \
+    -e POSTGRES_PASSWORD=apicurio-registry-password \
+    -e POSTGRES_DB=apicurio-registry \
+    -p 5432:5432 \
+    postgres:15
+----
+
+.Start Apicurio
+[source,bash]
+----
+podman run -it \
+    --rm=true \
+    --name apicurio-registry \
+    --network=apicurio-net \
+    -e "REGISTRY_DATASOURCE_URL=jdbc:postgresql://postgres-apicurio-registry/apicurio-registry" \
+    -e "REGISTRY_DATASOURCE_USERNAME=apicurio-registry-user" \
+    -e "REGISTRY_DATASOURCE_PASSWORD=apicurio-registry-password" \
+    -p 8080:8080 \
+    apicurio/apicurio-registry-sql:2.4.1.Final
+----
+
+
+Source: https://www.apicur.io/registry/docs/apicurio-registry/2.4.x/getting-started/assembly-installing-registry-docker.html
